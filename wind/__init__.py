@@ -228,10 +228,10 @@ class WindfieldAroundTrack(object):
             envPressure = np.NaN
 
         # Get the limits of the region
-        xMin = gridLimit['xMin']-self.margin
-        xMax = gridLimit['xMax']+self.margin
-        yMin = gridLimit['yMin']-self.margin
-        yMax = gridLimit['yMax']+self.margin
+        xMin = gridLimit['xMin']
+        xMax = gridLimit['xMax']
+        yMin = gridLimit['yMin']
+        yMax = gridLimit['yMax']
 
         # Setup a 'millidegree' integer grid for the region
         gridMargin = int(100. * self.margin)
