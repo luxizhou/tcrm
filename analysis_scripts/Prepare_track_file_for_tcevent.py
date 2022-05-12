@@ -9,7 +9,7 @@ Script to prepare input file for tcevent.py. The major task here is to produce r
 
 To-Do:
     1. parameterization for poci needs update based on west pacific data
-    2. parameterization for RMw needs update based on west pacific data
+    2. parameterization for RMW needs update based on west pacific data
 
 """
 
@@ -59,5 +59,5 @@ for index, row in print_track.iterrows():
 #%% change the time format 
 print_track['Time'] = print_track['Time'].dt.strftime("%Y%m%d%H")
 outfile = os.path.join('/home/lzhou/tcrm/input',filename)
-print_track.to_csv(outfile,index=False)
+print_track.to_csv(outfile,float_format="%.3f",index=False)
 
