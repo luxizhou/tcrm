@@ -14,16 +14,26 @@ from Utilities import track
 
 #%% readin hstorical data
 infile = r'/home/lzhou/tcrm/output/guangdong/process/origin_lon_lat'
-df = pd.read_csv(infile)
+hist_orig = pd.read_csv(infile)
 #%%
-infile = r'/home/lzhou/tcrm/output/guangdong/tracks/tracks.00000.nc'
-tracks = track.ncReadTrackData(infile)
-lat = np.array([])
-lon = np.array([])
-ll = len(tracks)
 
-for ii in np.arange(0,ll):
-    lat = lat.append(tracks[ii].Latitude[0])
-    lon = lon.append(tracks[ii].Longitude[0])
+folder = r'/home/lzhou/tcrm/output/guangdong/tracks/'
+files = os.listdir(folder)
+track_files = [f for f in files if 'tracks' in f]
+#%%
+#lat = np.array([])
+#lon = np.array([])
+#lat = np.array(tracks[0].Latitude[0])
+#lat = [-9999]
+lat = []
+lon = []
+#lon = tracks[0].Longitude[0]]
+for ff in track_files:
+    print(ff)
+    infile = os.path.join(folder,ff)
+    tracks = track.ncReadTrackData(infile)
+    for ii in np.arange(0,len(tracks)):
+        lat.append(tracks[ii].Latitude[0])
+        lon.append(tracks[ii].Longitude[0])
     
     
