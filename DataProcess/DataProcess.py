@@ -285,7 +285,7 @@ class DataProcess(object):
             self.logger.warning("No max wind speed data")
             vmax = np.empty(indicator.size, 'f')
         else:
-            novalue_index = np.where(vmax == sys.maxsize)
+            novalue_index = np.where(vmax == -1)
             vmax = metutils.convert(vmax, inputSpeedUnits, "mps")
             vmax[novalue_index] = sys.maxsize
 
@@ -296,7 +296,7 @@ class DataProcess(object):
 
         try:
             rmax = np.array(inputData['rmax'])
-            novalue_index = np.where(rmax == sys.maxsize)
+            novalue_index = np.where(rmax == -1)
             rmax = metutils.convert(rmax, inputLengthUnits, "km")
             rmax[novalue_index] = sys.maxsize
 
@@ -329,6 +329,9 @@ class DataProcess(object):
         dist = np.empty(indicator.size, 'f')
         dist[1:] = dist_
 
+        # a quick fix to lon
+        too_large_lon_index = np.where(lon>self.landmask.lon.max())
+        lon[too_large_lon_index] = self.landmask.lon.max()
         self._lonLat(lon, lat, indicator, initIndex)
         self._bearing(bear, indicator, initIndex)
         self._bearingRate(bear, dt, indicator)
