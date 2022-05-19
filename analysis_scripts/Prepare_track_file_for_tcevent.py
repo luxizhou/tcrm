@@ -37,7 +37,7 @@ print(track.Name.iloc[1])
 filename = str(track.Year.iloc[1])+'_'+track.Name.iloc[1]+'.csv'
 
 #track.plot(x='LON',y='LAT')
-print_track = track[['Time', 'LAT', 'LON', 'PRES']].copy().reset_index()
+print_track = track[['Time', 'LAT', 'LON', 'PRES','WND']].copy().reset_index()
 print_track['Time'] = pd.to_datetime(print_track['Time'])
 print_track['index'] = 0
 print_track['index'].iloc[0] = 1

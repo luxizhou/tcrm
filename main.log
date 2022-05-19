@@ -1,0 +1,67 @@
+2022-05-09 11:45:25: Started log file main.log (detail level INFO)
+2022-05-09 11:45:25: Running /home/lzhou/tcrm/tcevent.py (pid 21784)
+2022-05-09 11:45:25: Output will be stored under output
+2022-05-09 11:45:25: Interpolating tracks from Allstorms.ibtracs_wmo.v03r10.csv
+2022-05-09 11:45:25: Loading Allstorms.ibtracs_wmo.v03r10.csv
+2022-05-09 11:45:25: File not found: Allstorms.ibtracs_wmo.v03r10.csv
+Traceback (most recent call last):
+  File "/home/lzhou/tcrm/Utilities/columns.py", line 41, in colReadCSV
+    data = np.genfromtxt(dataFile, dtype=None, delimiter=delimiter,
+  File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/npyio.py", line 1813, in genfromtxt
+    fid = np.lib._datasource.open(fname, 'rt', encoding=encoding)
+  File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/_datasource.py", line 193, in open
+    return ds.open(path, mode, encoding=encoding, newline=newline)
+  File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/_datasource.py", line 532, in open
+    raise FileNotFoundError(f"{path} not found.")
+FileNotFoundError: Allstorms.ibtracs_wmo.v03r10.csv not found.
+2022-05-09 11:45:25: Traceback (most recent call last):
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/Utilities/columns.py", line 41, in colReadCSV
+2022-05-09 11:45:25: data = np.genfromtxt(dataFile, dtype=None, delimiter=delimiter,
+2022-05-09 11:45:25: File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/npyio.py", line 1813, in genfromtxt
+2022-05-09 11:45:25: fid = np.lib._datasource.open(fname, 'rt', encoding=encoding)
+2022-05-09 11:45:25: File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/_datasource.py", line 193, in open
+2022-05-09 11:45:25: return ds.open(path, mode, encoding=encoding, newline=newline)
+2022-05-09 11:45:25: File "/home/lzhou/miniconda3/lib/python3.9/site-packages/numpy/lib/_datasource.py", line 532, in open
+2022-05-09 11:45:25: raise FileNotFoundError(f"{path} not found.")
+2022-05-09 11:45:25: FileNotFoundError: Allstorms.ibtracs_wmo.v03r10.csv not found.
+2022-05-09 11:45:25: 
+2022-05-09 11:45:25: During handling of the above exception, another exception occurred:
+2022-05-09 11:45:25: 
+2022-05-09 11:45:25: Traceback (most recent call last):
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/tcevent.py", line 273, in startup
+2022-05-09 11:45:25: main(configFile)
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/tcevent.py", line 49, in wrap
+2022-05-09 11:45:25: res = f(*args, **kwargs)
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/tcevent.py", line 191, in main
+2022-05-09 11:45:25: interpTrack = interpolateTracks.parseTracks(configFile, trackFile,
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/Evaluate/interpolateTracks.py", line 303, in parseTracks
+2022-05-09 11:45:25: tracks = loadTrackFile(configFile, trackFile, source)
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/Utilities/loadData.py", line 825, in loadTrackFile
+2022-05-09 11:45:25: inputData = colReadCSV(configFile, trackFile, source) #,
+2022-05-09 11:45:25: File "/home/lzhou/tcrm/Utilities/columns.py", line 46, in colReadCSV
+2022-05-09 11:45:25: raise IOError("File not found: {0}".format(dataFile))
+2022-05-09 11:45:25: OSError: File not found: Allstorms.ibtracs_wmo.v03r10.csv
+2022-05-09 11:46:21: Started log file ./output/yasi/log/yasi.log (detail level INFO)
+2022-05-09 11:46:21: Running /home/lzhou/tcrm/tcevent.py (pid 21784)
+2022-05-09 11:46:21: Output will be stored under ./output/yasi
+2022-05-09 11:46:21: Interpolating tracks from ./example/yasi_modified.csv
+2022-05-09 11:46:21: Loading ./example/yasi_modified.csv
+2022-05-09 11:46:21: Using index contained in file to determine initial TC positions
+2022-05-09 11:46:22: Traceback (most recent call last):
+2022-05-09 11:46:22: File "/home/lzhou/tcrm/tcevent.py", line 273, in startup
+2022-05-09 11:46:22: main(configFile)
+2022-05-09 11:46:22: File "/home/lzhou/tcrm/tcevent.py", line 49, in wrap
+2022-05-09 11:46:22: res = f(*args, **kwargs)
+2022-05-09 11:46:22: File "/home/lzhou/tcrm/tcevent.py", line 191, in main
+2022-05-09 11:46:22: interpTrack = interpolateTracks.parseTracks(configFile, trackFile,
+2022-05-09 11:46:22: File "/home/lzhou/tcrm/Evaluate/interpolateTracks.py", line 311, in parseTracks
+2022-05-09 11:46:22: newtrack = interpolate(track, delta, interpolation_type)
+2022-05-09 11:46:22: File "/home/lzhou/tcrm/Evaluate/interpolateTracks.py", line 91, in interpolate
+2022-05-09 11:46:22: timestep = 24.0*(time_ - time_[0])
+2022-05-09 11:46:22: IndexError: index 0 is out of bounds for axis 0 with size 0
+2022-05-09 11:47:59: Started log file ./output/yasi/log/yasi.log (detail level INFO)
+2022-05-09 11:47:59: Running /home/lzhou/tcrm/tcevent.py (pid 21784)
+2022-05-09 11:48:11: Output will be stored under ./output/yasi
+2022-05-09 11:48:11: Interpolating tracks from ./example/yasi_modified.csv
+2022-05-09 11:48:11: Loading ./example/yasi_modified.csv
+2022-05-09 11:48:11: Using index contained in file to determine initial TC positions
