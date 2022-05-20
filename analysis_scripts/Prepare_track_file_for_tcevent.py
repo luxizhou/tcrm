@@ -59,5 +59,5 @@ for index, row in print_track.iterrows():
 #%% change the time format 
 print_track['Time'] = print_track['Time'].dt.strftime("%Y%m%d%H")
 outfile = os.path.join('/home/lzhou/tcrm/input',filename)
-print_track.to_csv(outfile,float_format="%.3f",index=False)
+#print_track.to_csv(outfile,float_format="%.3f",index=False)
 
