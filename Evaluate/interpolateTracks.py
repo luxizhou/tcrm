@@ -10,6 +10,9 @@ from Utilities.maputils import latLon2Azi
 from Utilities.loadData import loadTrackFile, maxWindSpeed
 from Utilities.track import Track, ncSaveTracks
 
+import matplotlib.dates as mtds
+mtds.set_epoch("0001-01-01T00:00:00")
+
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.NullHandler())
 
@@ -92,11 +95,11 @@ def interpolate(track, delta, interpolation_type=None):
 
     newtime = np.arange(timestep[0], timestep[-1] + .01, delta)
     newtime[-1] = timestep[-1]
-    _newtime = (newtime / 24.) + time_[0]
-    newdates = num2date(_newtime)
+    _newtime = (newtime / 24.) + time_[0] - 1.
+    newdates = num2date(_newtime) 
     newdates = np.array([n.replace(tzinfo=None) for n in newdates])
 
-    if not hasattr(track, 'Speed'):
+    if not hasattr(track, 'WindSpeed'):
         idx = np.zeros(len(track.data))
         idx[0] = 1
         # TODO: Possibly could change `np.mean(dt)` to `dt`?
