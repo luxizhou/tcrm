@@ -23,12 +23,11 @@ from Utilities.loadData import getPoci
 from numpy.random import default_rng
 
 
-#mslp_file = r'/home/lzhou/tcrm/input/slp.day.1981-2010.ltm.nc'
-#mslpVar = 'slp'
-#mslp = TrackGenerator.SamplePressure(mslp_file, var =mslpVar )
-#penv = mslp.get_pressure(DoY,lat,lon)
-penv = 1008.
+mslp_file = r'/home/lzhou/tcrm/MSLP/slp.day.ltm.nc'
+mslpVar = 'slp'
+mslp = TrackGenerator.SamplePressure(mslp_file, var =mslpVar )
 
+#%%
 track_file = r'/home/lzhou/Precipitation/Precipitation_Scripts/Output/CMA_Best_Tracks.csv'
 tracks = pd.read_csv(track_file)
 #%%
@@ -52,7 +51,9 @@ for index, row in print_track.iterrows():
     #period = pd.Period(print_track['Time'].iloc[ii],freq='H')
     period = pd.Period(row['Time'],freq='D')
     print_track.loc[index,'DoY'] = period.dayofyear
-    print_track.loc[index,'Poci'] = getPoci(penv,print_track.loc[index,'PRES'],print_track.loc[index,'LAT'],print_track.loc[index,'DoY'],print_track.loc[index,'poci_eps'])
+    aa = np.array([[print_track.loc[index,'DoY']],[print_track.loc[index,'LAT']],[print_track.loc[index,'LON']]])
+    print_track.loc[index,'Penv'] = mslp.get_pressure(aa)
+    print_track.loc[index,'Poci'] = getPoci(print_track.loc[index,'Penv'],print_track.loc[index,'PRES'],print_track.loc[index,'LAT'],print_track.loc[index,'DoY'],print_track.loc[index,'poci_eps'])
     dp = print_track.loc[index,'Poci']-print_track.loc[index,'PRES']
     print_track.loc[index,'RMW'] = trackSize.rmax(dp,print_track.loc[index,'LAT'],print_track.loc[index,'RMW_eps'])
 
