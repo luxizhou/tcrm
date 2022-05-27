@@ -63,7 +63,7 @@ tracks = pd.read_csv(infile)
 
 #%%
 
-run_case = '2013_Fitow'
+run_case = '2013_Fitow_ZJ'
 
 outdir = '/home/lzhou/tcrm/output'
 
@@ -88,9 +88,9 @@ for track_file in track_files:
         print('Gust: ', track_file)
         gust_data.plot(x='Time',y='Speed',linestyle='',marker='o', color='r', markersize=6,label='CMA Gust',ax=ax)
      
-    if gust_data.empty == False:
-        print('Gust: ', track_file)
+    if gale_data.empty == False:
+        print('Gale: ', track_file)
         gale_data.plot(x='Time',y='Speed',linestyle='',marker='o', color='b', markersize=6,label='CMA Gale',ax=ax)  
    
     if gust_data.empty == False or gale_data.empty== False:
-        plt.legend(loc='upper right')
+        plt.legend()
