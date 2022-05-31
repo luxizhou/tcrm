@@ -541,9 +541,9 @@ class HazardMap(FilledContourMapFigure):
 
     """
     def plot(self, data, xgrid, ygrid, title, lvls, cbarlab, map_kwargs):
-        #dx = np.mean(np.diff(xgrid))
-        #dmask = data.mask
-        #data = ma.array(data, mask=dmask)
+        dx = np.mean(np.diff(xgrid))
+        dmask = data.mask
+        data = ma.array(data, mask=dmask)
         self.add(data, xgrid, ygrid, title, lvls, cbarlab, map_kwargs)
         self.cmap = sns.light_palette("orange", as_cmap=True)
         super(HazardMap, self).plot()
