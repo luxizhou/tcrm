@@ -285,7 +285,7 @@ class DataProcess(object):
             self.logger.warning("No max wind speed data")
             vmax = np.empty(indicator.size, 'f')
         else:
-            novalue_index = np.where(vmax == -1)
+            novalue_index = np.where(vmax == sys.maxsize)
             vmax = metutils.convert(vmax, inputSpeedUnits, "mps")
             vmax[novalue_index] = sys.maxsize
 
@@ -296,7 +296,7 @@ class DataProcess(object):
 
         try:
             rmax = np.array(inputData['rmax'])
-            novalue_index = np.where(rmax == -1)
+            novalue_index = np.where(rmax == sys.maxsize)
             rmax = metutils.convert(rmax, inputLengthUnits, "km")
             rmax[novalue_index] = sys.maxsize
 
