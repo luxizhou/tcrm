@@ -15,6 +15,7 @@ import os
 import logging
 
 import numpy as np
+import pandas as pd
 
 from os.path import join as pjoin
 from scipy.stats import scoreatpercentile as percentile
@@ -92,6 +93,7 @@ class LandfallRates(object):
 
         """
 
+
         landfall = []
         offshore = []
 
@@ -127,7 +129,12 @@ class LandfallRates(object):
         # Generate the histograms to be returned:
         lh, n = np.histogram(landfall, np.arange(len(self.gates)), density=True)
         oh, n = np.histogram(offshore, np.arange(len(self.gates)), density=True)
-        return lh, oh
+        
+        # Generate the counting number to be returned:        
+        lhc, n = np.histogram(landfall, np.arange(len(self.gates)), density=False)
+        #lhc = lhc/nyears
+
+        return lh, oh, lhc
 
     def processResults(self, results, index):
         """
@@ -139,9 +146,11 @@ class LandfallRates(object):
         :param int index: synthetic event counter.
 
         """
-        sLF, sOF = results
+        sLF, sOF, sLFC = results
         self.synLandfall[index, :] = sLF
         self.synOffshore[index, :] = sOF
+        self.synLandfallcount[index, :] = sLFC
+        self.synLandfallrates[index, :] = sLFC / self.synNumYears
 
     def calculateStats(self):
         """
@@ -153,12 +162,20 @@ class LandfallRates(object):
 
         self.synMeanLandfall = np.mean(self.synLandfall, axis=0)
         self.synMeanOffshore = np.mean(self.synOffshore, axis=0)
+        self.synMeanLandfallcount = np.mean(self.synLandfallcount, axis=0)
+        self.synMeanLandfallrates = np.mean(self.synLandfallrates, axis=0)
+        
 
         self.synUpperLF = percentile(self.synLandfall, per=95, axis=0)
         self.synLowerLF = percentile(self.synLandfall, per=5, axis=0)
         self.synUpperOF = percentile(self.synOffshore, per=95, axis=0)
         self.synLowerOF = percentile(self.synOffshore, per=5, axis=0)
-
+        self.synUpperLFR = percentile(self.synLandfallrates, per=95, axis=0)
+        self.synLowerLFR = percentile(self.synLandfallrates, per=5, axis=0)
+        self.synUpperLFC = percentile(self.synLandfallcount, per=95, axis=0)
+        self.synLowerLFC = percentile(self.synLandfallcount, per=5, axis=0)
+        
+        
     @disableOnWorkers
     def setOutput(self, ntracks):
         """
@@ -169,6 +186,9 @@ class LandfallRates(object):
         """
         self.synLandfall = np.zeros((ntracks, len(self.gates) - 1))
         self.synOffshore = np.zeros((ntracks, len(self.gates) - 1))
+        self.synLandfallcount = np.zeros((ntracks, len(self.gates) - 1))
+        self.synLandfallrates = np.zeros((ntracks, len(self.gates) - 1))
+
 
     @disableOnWorkers
     def historic(self):
@@ -191,14 +211,23 @@ class LandfallRates(object):
                          format(inputFile))
             raise
         else:
-            self.historicLandfall, self.historicOffshore = \
+            # get the number of years in catalog
+            self.historicYears = tracks[-1].Year[-1]-tracks[0].Year[0]+1
+            
+            self.historicLandfall, self.historicOffshore, self.historicLandfallcount  = \
                                         self.processTracks(tracks)
+            
+            self.historicLandfallrates = self.historicLandfallcount / self.historicYears
 
         return
 
     def synthetic(self):
         """Load synthetic data and calculate histogram"""
         LOG.info("Processing landfall rates of synthetic events")
+
+        #config = ConfigParser()
+        #config.read(self.configFile)
+        #self.synYears = config.get('TrackGenerator','YearsPerSimulation')
 
         work_tag = 0
         result_tag = 1
@@ -257,6 +286,9 @@ class LandfallRates(object):
                           format(n + 1, len(trackfiles)))
                 tracks = loadTracks(trackfile)
                 results = self.processTracks(tracks)
+                #a,b,c = self.processTracks(tracks)
+                #d = c/self.synNumYears
+                #results = [a,b,c,d]
                 self.processResults(results, n)
 
             self.calculateStats()
@@ -287,15 +319,60 @@ class LandfallRates(object):
         figure.plot()
         outputFile = pjoin(self.plotPath, 'landfall_rates.png')
         saveFigure(figure, outputFile)
+    
+    @disableOnWorkers
+    def save(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
+        his_outputFile = pjoin(self.dataPath, 'historical_landfall_rates.csv')
+        syn_outputFile = pjoin(self.dataPath, 'simulated_landfall_rates.csv')
+        
+        df_his = pd.DataFrame(columns=['GateID','Landfall_Rates','Landfall_Probability', \
+                                       'Total_Landfall_Number','Offshore_Probability'])
+        df_his['GateID'] = list(np.arange(0,len(self.historicLandfall)))
+        df_his['Landfall_Rates'] = self.historicLandfallrates
+        df_his['Landfall_Probability'] = self.historicLandfall
+        df_his['Total_Landfall_Number'] = self.historicLandfallcount
+        df_his['Offshore_Probability'] = self.historicOffshore
+        
+        df_his.to_csv(his_outputFile,index=False)
+        
+        
+        df_syn = pd.DataFrame(columns=['GateID','Landfall_Rates','LFR_95','LFR_5', \
+                                       'Landfall_Probability','LFP_95','LFP_5', \
+                                       'Total_Landfall_Number','LFC_95','LFC_5', \
+                                       'Offshore_Probability','OFP_95','OFP_5'])
+    
+        df_syn['GateID'] = list(np.arange(0,len(self.synLandfall)))
+        df_syn['Landfall_Rates'] = self.synLandfallrates
+        df_syn['Landfall_Rates'] = self.synUpperLFR
+        df_syn['Landfall_Rates'] = self.synLowerLFR
+        df_syn['Landfall_Probability'] = self.synLandfall
+        df_syn['Landfall_Rates'] = self.synUpperLF
+        df_syn['Landfall_Rates'] = self.synLowerLF
+        df_syn['Total_Landfall_Number'] = self.synLandfallcount
+        df_syn['Landfall_Rates'] = self.synUpperLFC
+        df_syn['Landfall_Rates'] = self.synLowerLFC
+        df_syn['Offshore_Probability'] = self.synOffshore
+        df_syn['Landfall_Rates'] = self.synUpperOF
+        df_syn['Landfall_Rates'] = self.synLowerOF
+        
+        df_syn.to_csv(syn_outputFile,index=False)
 
     def run(self):
         """Execute the analysis"""
         global MPI, comm
         MPI = attemptParallel()
         comm = MPI.COMM_WORLD
-        self.historic()
-        comm.barrier()
+        #self.historic()
+        #comm.barrier()
         self.synthetic()
         comm.barrier()
         self.plot()
-        #self.save()
+        self.save()

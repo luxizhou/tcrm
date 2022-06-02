@@ -25,14 +25,14 @@ def run(configFile):
 
     """
 
-    pd = PressureDistribution(configFile)
-    td = TrackDensity(configFile)
-    lc = LongitudeCrossing(configFile)
+    #pd = PressureDistribution(configFile)
+    #td = TrackDensity(configFile)
+    #lc = LongitudeCrossing(configFile)
     lf = LandfallRates(configFile)
-    gd = GenesisDensity(configFile)
+    #gd = GenesisDensity(configFile)
 
-    pd.run()
-    td.run()
-    lc.run()
+    #pd.run()
+    #td.run()
+    #lc.run()
     lf.run()
-    gd.run()
+    #gd.run()
