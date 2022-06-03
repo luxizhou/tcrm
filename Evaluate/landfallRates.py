@@ -341,7 +341,7 @@ class LandfallRates(object):
         df_his['Total_Landfall_Number'] = self.historicLandfallcount
         df_his['Offshore_Probability'] = self.historicOffshore
         
-        df_his.to_csv(his_outputFile,index=False)
+        df_his.to_csv(his_outputFile,index=False,float_format="%.3f")
         
         
         df_syn = pd.DataFrame(columns=['GateID','Landfall_Rates','LFR_95','LFR_5', \
@@ -349,29 +349,29 @@ class LandfallRates(object):
                                        'Total_Landfall_Number','LFC_95','LFC_5', \
                                        'Offshore_Probability','OFP_95','OFP_5'])
     
-        df_syn['GateID'] = list(np.arange(0,len(self.synLandfall)))
-        df_syn['Landfall_Rates'] = self.synLandfallrates
-        df_syn['Landfall_Rates'] = self.synUpperLFR
-        df_syn['Landfall_Rates'] = self.synLowerLFR
-        df_syn['Landfall_Probability'] = self.synLandfall
-        df_syn['Landfall_Rates'] = self.synUpperLF
-        df_syn['Landfall_Rates'] = self.synLowerLF
-        df_syn['Total_Landfall_Number'] = self.synLandfallcount
-        df_syn['Landfall_Rates'] = self.synUpperLFC
-        df_syn['Landfall_Rates'] = self.synLowerLFC
-        df_syn['Offshore_Probability'] = self.synOffshore
-        df_syn['Landfall_Rates'] = self.synUpperOF
-        df_syn['Landfall_Rates'] = self.synLowerOF
+        df_syn['GateID'] = list(np.arange(0,len(self.synMeanLandfall)))
+        df_syn['Landfall_Rates'] = self.synMeanLandfallrates
+        df_syn['LFR_95'] = self.synUpperLFR
+        df_syn['LFR_5'] = self.synLowerLFR
+        df_syn['Landfall_Probability'] = self.synMeanLandfall
+        df_syn['LFP_95'] = self.synUpperLF
+        df_syn['LFP_5'] = self.synLowerLF
+        df_syn['Total_Landfall_Number'] = self.synMeanLandfallcount
+        df_syn['LFC_95'] = self.synUpperLFC
+        df_syn['LFC_5'] = self.synLowerLFC
+        df_syn['Offshore_Probability'] = self.synMeanOffshore
+        df_syn['OFP_95'] = self.synUpperOF
+        df_syn['OFP_5'] = self.synLowerOF
         
-        df_syn.to_csv(syn_outputFile,index=False)
+        df_syn.to_csv(syn_outputFile,index=False,float_format="%.3f")
 
     def run(self):
         """Execute the analysis"""
         global MPI, comm
         MPI = attemptParallel()
         comm = MPI.COMM_WORLD
-        #self.historic()
-        #comm.barrier()
+        self.historic()
+        comm.barrier()
         self.synthetic()
         comm.barrier()
         self.plot()

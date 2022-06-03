@@ -257,6 +257,9 @@ class RangeCompareCurve(CurveFigure):
         """
         self.subfigures.append((xdata, y1, y2, y2max, y2min,
                                 xlabel, ylabel, title))
+        
+        #self.subfigures.append((xdata, y1, y2, y2max, y2min, legend1, legend2
+        #                        xlabel, ylabel, title))
 
     def subplot(self, axes, subfigure):
         """
@@ -270,11 +273,14 @@ class RangeCompareCurve(CurveFigure):
                                 to the subplot.
         """
         xdata, y1, y2, y2max, y2min, xlabel, ylabel, title = subfigure
+        #xdata, y1, y2, y2max, y2min, legend1, legend2, xlabel, ylabel, title = subfigure
 
-        axes.plot(xdata, y1, color='r', lw=2, label="")
-        axes.plot(xdata, y2, color='k', lw=2, label="")
+        #axes.plot(xdata, y1, color='r', lw=2, label=legend1)
+        #axes.plot(xdata, y2, color='k', lw=2, label=legend2)
+        axes.plot(xdata, y1, color='r', lw=2, label="History")
+        axes.plot(xdata, y2, color='k', lw=2, label="Simulation")
+        axes.legend()
         self.addRange(axes, xdata, y2min, y2max)
-
         axes.set_xlabel(xlabel)
         axes.set_ylabel(ylabel)
         axes.set_title(title)
