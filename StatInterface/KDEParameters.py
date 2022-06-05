@@ -233,7 +233,7 @@ class KDEParameters(object):
 
         kde = sm.nonparametric.KDEUnivariate(dataset)
 
-        kde.fit(kernel=self.kdeType, fft=False, 
+        kde.fit(kernel=self.kdeType,bw=bw, fft=False, 
                 gridsize=len(grid), clip=(min(grid), max(grid)), cut=0)
         veceval = np.vectorize(kde.evaluate)
         pdf = veceval(grid)
