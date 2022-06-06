@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun  6 13:28:31 2022
+
+@author: lzhou
+"""
+
+import os
+import geopandas as gpd
+from Utilities.track import ncReadTrackData
+import matplotlib.pyplot as plt
+
+#%%
+trackPath =  r'/home/lzhou/tcrm/output/GD_since1979_doEvaluation/tracks'
+trackFiles = os.listdir(trackPath)
+#%%
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+cn_shape = world[world.name=='China'].copy()
+cn_shape.reset_index(drop=True,inplace=True)
+#%%
+fig,ax = plt.subplots(figsize=(6,6))
+cn_shape.boundary.plot(ax=ax)
+
+for trackFile in trackFiles[1]:
+    infile = os.path.join(trackPath, trackFile)
+    tracks = ncReadTrackData(infile)
+    for track in tracks:
+        plt.plot(track.Longitude,track.Latitude,color='grey')
