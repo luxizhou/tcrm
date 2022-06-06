@@ -879,7 +879,12 @@ def run(configFile, callback=None):
 
     outputPath = config.get('Output', 'Path')
     windfieldPath = pjoin(outputPath, 'windfield')
-    trackPath = pjoin(outputPath, 'tracks')
+    
+    trackPath = config.get('WindfieldInterface','TrackPath')
+    if trackPath == None:
+        trackPath = pjoin(outputPath, 'tracks')
+
+         
 
     gridLimit = None
     if config.has_option('Region', 'gridLimit'):
