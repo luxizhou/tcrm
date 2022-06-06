@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 
 #%%
 trackPath =  r'/home/lzhou/tcrm/output/GD_since1979_doEvaluation/tracks'
+plotPath = r'/home/lzhou/tcrm/analysis_scripts/figures'
 trackFiles = os.listdir(trackPath)
 #%%
 world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
@@ -21,8 +22,15 @@ cn_shape.reset_index(drop=True,inplace=True)
 #%%
 fig,ax = plt.subplots(figsize=(6,6))
 cn_shape.boundary.plot(ax=ax)
-
-for trackFile in trackFiles[1]:
+infile = os.path.join(trackPath, trackFiles[0])
+tracks = ncReadTrackData(infile)
+for track in tracks:
+    plt.plot(track.Longitude,track.Latitude,color='grey')
+figname = trackFiles[0][:-3] + '.png'
+ofile = os.path.join(plotPath,figname)
+fig.savefig(ofile)
+#%%
+for trackFile in trackFiles:
     infile = os.path.join(trackPath, trackFile)
     tracks = ncReadTrackData(infile)
     for track in tracks:
