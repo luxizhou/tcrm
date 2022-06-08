@@ -266,7 +266,9 @@ class DataProcess(object):
                    header, ',', fmt='%d')
 
         pressure = np.array(inputData['pressure'], 'float32')
-        novalue_index = np.where(pressure == sys.maxsize)
+        # empty field for pressure got assigned to -1 when read in. 2022.06.08 LZ
+        #novalue_index = np.where(pressure == sys.maxsize)
+        novalue_index = np.where(pressure ==-1)
         pressure = metutils.convert(pressure, inputPressureUnits, "hPa")
         pressure[novalue_index] = sys.maxsize
 
@@ -332,7 +334,7 @@ class DataProcess(object):
         dist = np.empty(indicator.size, 'f')
         dist[1:] = dist_
 
-        # a quick fix to lon
+        # a quick fix to lon, lat
         too_large_lon_index = np.where(lon>self.landmask.lon.max())
         lon[too_large_lon_index] = self.landmask.lon.max()
         self._lonLat(lon, lat, indicator, initIndex)
@@ -347,7 +349,7 @@ class DataProcess(object):
         self._windSpeed(vmax)
 
         try:
-            self._frequency(year, indicator)
+            self._frequency(year, indicator,startSeason)
             self._juliandays(jdays, indicator, year)
         except (ValueError, KeyError):
             pass
@@ -380,6 +382,11 @@ class DataProcess(object):
         for i, [x, y] in enumerate(zip(lon, lat)):
             if self.landmask.sampleGrid(x, y) > 0:
                 lsflag[i] = 1
+                # TC always originate from ocean, therefore, we purge the origins that are over the land here.
+                # as a consequence, it is needed to consider how to deal with those points following the removed orgin points. 
+                # right now, i haven't got time look into the issue. By LZ. 2022.06.08
+                indicator[i] = 0
+                initIndex[i] = 0
 
         lonOne = lon.compress(indicator)
         latOne = lat.compress(indicator)
@@ -469,7 +476,7 @@ class DataProcess(object):
 
     def _speed(self, dist, dt, indicator, initIndex):
         """
-        Extract speeds for all obs, initial obs and TC origins
+        Extract (translational) speeds for all obs, initial obs and TC origins
         Input: dist - array of distances between consecutive TC
                       observations (km)
                dt - array of times between consecutive TC observations (hours)
@@ -782,7 +789,7 @@ class DataProcess(object):
             header = 'All rmax change rates (km/hr)'
             flSaveFile(rmax_rate, rmaxRate, header, fmt='%6.2f')
 
-    def _frequency(self, years, indicator):
+    def _frequency(self, years, indicator, startSeason=None):
         """
         Generate a histogram of the annual frequency of events from the input
         data
@@ -798,8 +805,14 @@ class DataProcess(object):
             frequency = pjoin(self.processPath, 'frequency')
             bins = np.arange(minYr, maxYr + 2, 1)
             n, b = np.histogram(genesisYears, bins)
+            # fix the issue that it extrack the event that originate from last year December,
+            # which gives 1 or 2 events in the first bin. Alternatively it can be fix by comparing startSeason
+            # by LZ. 2022.06.08
+            if b[0] >  3:
+                n = n[1:]
+                b = b[1:]
             header = 'Year,count'
-            flSaveFile(frequency, np.transpose([bins[:-1], n]),
+            flSaveFile(frequency, np.transpose([b[:-1], n]),
                        header, fmt='%6.2f')
 
             self.logger.info("Mean annual frequency: {0}".format(np.mean(n)))
