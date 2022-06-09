@@ -51,7 +51,8 @@ class StatInterface(object):
         log.info("Initialising StatInterface")
 
         self.kdeType = config.get('StatInterface', 'kdeType')
-        minSamplesCell = config.getint('StatInterface', 'minSamplesCell')
+        #minSamplesCell = config.getint('StatInterface', 'minSamplesCell')
+        self.minSamplesCell = config.getint('StatInterface', 'minSamplesCell')
         self.kdeStep = config.getfloat('StatInterface', 'kdeStep')
         self.outputPath = config.get('Output', 'Path')
         self.processPath = pjoin(self.outputPath, 'process')
@@ -83,7 +84,7 @@ class StatInterface(object):
                                                   self.gridLimit,
                                                   gridSpace, gridInc,
                                                   self.kdeType,
-                                                  minSamplesCell,
+                                                  self.minSamplesCell,
                                                   missingValue)
         self.gridSpace = gridSpace
         self.gridInc = gridInc
@@ -100,9 +101,11 @@ class StatInterface(object):
         kde = KDEOrigin.KDEOrigin(self.configFile,
                                   self.gridLimit, 0.1,
                                   progressbar=self.progressbar)
-        kde.generateKDE(save=True, plot=True)
-        kde.generateCdf()
-
+        kde.generateKDE(save=True, plot=False)
+        
+        #kde.generateCDF(save=True) has problem. by LZ. 2022.06.09
+        kde.generateCdf(save=False)
+        
     def kdeGenesisDate(self):
         """
         Generate CDFs relating to the genesis day-of-year of cyclones
@@ -177,8 +180,9 @@ class StatInterface(object):
 
         lonLat = pjoin(self.processPath, 'origin_lon_lat')
         pList = pjoin(self.processPath, 'init_pressure')
-        self.generateDist.allDistributions(lonLat, pList, 'init_pressure',
-                                           self.kdeStep)
+        #self.generateDist.allDistributions(lonLat, pList, 'init_pressure',
+        #                                   self.kdeStep)
+        self.generateDist.allDistributions(lonLat, pList, 'init_pressure', 1.)
 
     def cdfCellSize(self):
         """
@@ -231,7 +235,7 @@ class StatInterface(object):
                 self.gridLimit,
                 self.gridSpace,
                 self.gridInc,
-                minSample=minSample,
+                minSample=self.minSamplesCell,
                 angular=angular)
 
         log.debug('Calculating cell statistics for speed')

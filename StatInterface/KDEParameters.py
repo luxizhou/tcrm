@@ -139,8 +139,11 @@ class KDEParameters(object):
             self.parameters = np.concatenate([self.parameters - periodic,
                                               self.parameters,
                                               self.parameters + periodic])
+        elif angular:
+            self.grid = np.arange(xmin,xmax,kdeStep)
         else:
-            self.grid = np.arange(xmin, xmax, kdeStep)
+            dummy = np.max([0,xmin-kdeStep])
+            self.grid = np.arange(dummy, xmax+kdeStep, kdeStep)
 
         if self.grid.size < 2:
             LOG.critical("Grid for CDF generation is a single value")

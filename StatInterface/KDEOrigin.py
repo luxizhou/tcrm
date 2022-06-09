@@ -63,7 +63,7 @@ class KDEOrigin(object):
 
     """
 
-    def __init__(self, configFile, gridLimit, kdeStep, lonLat=None,
+    def __init__(self, configFile, gridLimit, kdeStep, lonLat=None,filterOrigin=False,
                  progressbar=None):
         """
 
@@ -91,13 +91,17 @@ class KDEOrigin(object):
             self.lonLat = ll[:, 0:2]
         else:
             self.lonLat = lonLat[:, 0:2]
+        
+        # If using ibtracs.All dataset, filterOrigin should be True since usually we are only focusing on one basin. 
+        # e.g. using ibtracs.WP dastaset for CN domain, then filterOrigin should be False.
+        # by LZ. 2022.06.09
+        if filterOrigin:
+            ii = np.where((self.lonLat[:, 0] >= gridLimit['xMin']) &
+                          (self.lonLat[:, 0] <= gridLimit['xMax']) &
+                          (self.lonLat[:, 1] >= gridLimit['yMin']) &
+                          (self.lonLat[:, 1] <= gridLimit['yMax']))
 
-        ii = np.where((self.lonLat[:, 0] >= gridLimit['xMin']) &
-                      (self.lonLat[:, 0] <= gridLimit['xMax']) &
-                      (self.lonLat[:, 1] >= gridLimit['yMin']) &
-                      (self.lonLat[:, 1] <= gridLimit['yMax']))
-
-        self.lonLat = self.lonLat[ii]
+            self.lonLat = self.lonLat[ii]
 
         self.bw = getOriginBandwidth(self.lonLat)
         LOGGER.info("Bandwidth: %s", repr(self.bw))
