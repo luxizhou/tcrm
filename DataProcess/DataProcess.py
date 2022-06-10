@@ -253,17 +253,7 @@ class DataProcess(object):
         indicator[np.where(delta_lon > 15)[0] + 1] = 1
         indicator[np.where(delta_lat > 5)[0] + 1] = 1
 
-        # Save information required for frequency auto-calculation
-        try:
-            origin_seasonOrYear = np.array(
-                inputData['season'], 'i').compress(indicator)
-            header = 'Season'
-        except (ValueError, KeyError):
-            origin_seasonOrYear = year.compress(indicator)
-            header = 'Year'
 
-        flSaveFile(self.origin_year, np.transpose(origin_seasonOrYear),
-                   header, ',', fmt='%d')
 
         pressure = np.array(inputData['pressure'], 'float32')
         # empty field for pressure got assigned to -1 when read in. 2022.06.08 LZ
@@ -353,6 +343,18 @@ class DataProcess(object):
             self._juliandays(jdays, indicator, year)
         except (ValueError, KeyError):
             pass
+
+        # Save information required for frequency auto-calculation
+        try:
+            origin_seasonOrYear = np.array(
+                inputData['season'], 'i').compress(indicator)
+            header = 'Season'
+        except (ValueError, KeyError):
+            origin_seasonOrYear = year.compress(indicator)
+            header = 'Year'
+
+        flSaveFile(self.origin_year, np.transpose(origin_seasonOrYear),
+                   header, ',', fmt='%d')
 
         self.logger.info("Completed {0}".format(flModuleName()))
         if self.progressbar is not None:

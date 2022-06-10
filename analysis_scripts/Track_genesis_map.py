@@ -44,12 +44,12 @@ data = rootgrp.groups['tracks'].groups['tracks-0032'].variables['track']
 outdir = r'/home/lzhou/tcrm/output'
 
 figdir = r'/home/lzhou/tcrm/analysis_scripts/figures'
-casename = 'guangdong'
+casename = 'china_since1979'
 figname = 'Genesis_Map_' + casename
 trackdir = os.path.join(outdir, casename,'tracks')
 genesisFile = os.path.join(trackdir,'origins.pkl')
 
-'''
+
 #%% extrac genesis location and save to pickle file
 
 files = os.listdir(trackdir)
@@ -83,7 +83,7 @@ pickle.dump(origins,f)
 pickle.dump(orig_lon,f)
 f.close()
 
-'''
+
 
 #%% test load
 s = open(genesisFile,'rb') 

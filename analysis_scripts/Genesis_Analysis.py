@@ -20,15 +20,23 @@ from statsmodels.nonparametric.kernel_density import KDEMultivariate
 #from StatInterface import KDEOrigin
 
 #%% extract genesis points and save to file
-'''
-folder = r'/home/lzhou/tcrm/output/GD_since1979_doTrackGeneration/tracks'
-output_dir = r'/home/lzhou/tcrm/output/GD_since1979_doTrackGeneration/process/simulated_origins'
 
-files = os.listdir(folder)
+folder = r'/home/lzhou/tcrm/output/china_since1979/tracks'
+output_dir = r'/home/lzhou/tcrm/output/china_since1979/process/simulated_origins'
+
+if os.path.isdir(output_dir) == False:
+    os.mkdir(output_dir)
+    
+#files = os.listdir(folder)
+#files.sort()
+
+trackFiles = os.listdir(folder)
+files = [f for f in trackFiles if 'nc' in f]
 files.sort()
+
 #fq_simu = pd.DataFrame(columns=['Freq'])
 for ii in np.arange(0,len(files)):
-    if np.mod(ii,100)==0:
+    if np.mod(ii,10)==0:
         print('Process trackfile: ', files[ii])
     df_simu = pd.DataFrame(columns=['lon','lat','year'])
 
@@ -41,7 +49,7 @@ for ii in np.arange(0,len(files)):
     fname = files[ii][:-3] + '.csv'
     outfile = os.path.join(output_dir,fname)
     df_simu.to_csv(outfile,index=False,float_format="%.2f")
-'''   
+
 #%% Historical data
 folder = '/home/lzhou/tcrm/output/GD_since1979_doTrackGeneration/process'
 df_loc = pd.read_csv(os.path.join(folder,'origin_lon_lat'),skiprows=1,names=['lon','lat','LSflag'])
