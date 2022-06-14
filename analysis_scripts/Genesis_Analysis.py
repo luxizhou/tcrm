@@ -60,9 +60,7 @@ df_loc = pd.read_csv(os.path.join(hist_folder,'origin_lon_lat'),skiprows=1,names
 df_year = pd.read_csv(os.path.join(hist_folder,'origin_year'),skiprows=1,names=['year'])
 df = pd.concat([df_loc,df_year],axis=1)
 fq = df.value_counts('year').to_frame(name='frequency').reset_index().sort_values(by='year')
-#%% plot frequency
-fig1,axes = plt.subplots(2,1,sharex=True)
-sns.histplot(fq.frequency,binwidth=1,kde=True,ax=axes[0])
+aa = fq.frequency.values
 
 #%% calculate pdf of the origin location
 # initiate kernel
@@ -112,10 +110,18 @@ for fn in files[1:]:
     idx +=1    
 #%%
 simu_fq['Count'] = simu_fq.Count.astype('int')
-sns.histplot(simu_fq.Count,binwidth=1,kde=True,ax=axes[1])
+bb = simu_fq.Count.values
+#%% plot frequency
+fig1,axes = plt.subplots(2,1,sharex=True)
+sns.histplot(aa,binwidth=1,kde=True,ax=axes[0]).set(title='Historcal Data 1979-2021')
+sns.histplot(bb,binwidth=1,kde=True,ax=axes[1]).set(title='100 Years simulation')
 figname = 'Compare_Genesis_Frequency.png'
-ofile = os.path.join(plot_folder,figname)
-plt.savefig(ofile)
+plt.savefig(figname)
+#sns.histplot(aa,binwidth=1,kde=True,ax=axes[0],legend=True)
+#sns.histplot(bb,binwidth=1,kde=True,ax=axes[1],legend=True)
+#figname = 'Compare_Genesis_Frequency.png'
+#ofile = os.path.join(plot_folder,figname)
+#plt.savefig(ofile)
 #%% initiate kernel
 simu_kde2 = KDEMultivariate(sarray,bw=bw,var_type='cc')
 #%% evaluate pdf
