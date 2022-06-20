@@ -83,6 +83,66 @@ class LandfallRates(object):
 
 
 
+    def processTracks_hist(self, tracks):
+        """
+        Given a collection of :class:`Track` objects and set of gate vertices,
+        calculate if the tracks cross the gates in either an onshore or
+        offshore direction.
+
+        Returns the histograms for the gate counts.
+
+        """
+
+
+        landfall = []
+        offshore = []
+
+        for t in tracks:
+            for i in range(1, len(t.Longitude)):
+                cross = Int.Crossings()
+                start = Int.Point(t.Longitude[i-1], t.Latitude[i-1])
+                end = Int.Point(t.Longitude[i], t.Latitude[i])
+
+                startOnshore = Int.inLand(start, self.coast)
+                endOnshore = Int.inLand(end, self.coast)
+
+                if not startOnshore and endOnshore:
+                    # Landfall:
+                    cross = Int.Crossings()
+                    for j in range(1, len(self.gates) - 1):
+                        r = cross.LineLine(start, end,
+                                           self.gates[j-1],
+                                           self.gates[j])
+                        if r.status == "Intersection":
+                            landfall.append([j, t.Year[i]])
+
+                elif startOnshore and not endOnshore:
+                    # Moving offshore:
+                    cross = Int.Crossings()
+                    for j in range(1, len(self.gates) - 1):
+                        r = cross.LineLine(start, end,
+                                           self.gates[j - 1],
+                                           self.gates[j])
+                        if r.status == "Intersection":
+                            offshore.append(j)
+
+        # Generate the histograms to be returned:
+        landfall = np.array(landfall)
+        lh, n = np.histogram(landfall[:,0], np.arange(len(self.gates)), density=True)
+        oh, n = np.histogram(offshore, np.arange(len(self.gates)), density=True)
+        
+        # Generate the counting number to be returned:        
+        lhc, n = np.histogram(landfall, np.arange(len(self.gates)), density=False)
+        lhy, years = np.histogram(landfall[:,1],np.arange(tracks[0].Year[0],tracks[-1].Year[-1]))
+        #lhc = lhc/nyears
+        
+        # dirty way to filter out the 'first' year starting from Dec. by LZ. 2022 June 20
+        if lhy[0] <3 :
+            lhy = lhy[1:]
+            years = years[1:]
+
+        return lh, oh, lhc, lhy, years[:-1]
+    
     def processTracks(self, tracks):
         """
         Given a collection of :class:`Track` objects and set of gate vertices,
@@ -135,7 +195,6 @@ class LandfallRates(object):
         #lhc = lhc/nyears
 
         return lh, oh, lhc
-
     def processResults(self, results, index):
         """
         Populate the :attr:`self.synLandfall` and :attr:`self.synOffshore`
@@ -214,8 +273,9 @@ class LandfallRates(object):
             # get the number of years in catalog
             self.historicYears = tracks[-1].Year[-1]-tracks[0].Year[0]+1
             
-            self.historicLandfall, self.historicOffshore, self.historicLandfallcount  = \
-                                        self.processTracks(tracks)
+            self.historicLandfall, self.historicOffshore, \
+            self.historicLandfallcount, self.historicLandfallCountbyYear, \
+            self.historicYearID = self.processTracks_hist(tracks)
             
             self.historicLandfallrates = self.historicLandfallcount / self.historicYears
 
@@ -321,7 +381,7 @@ class LandfallRates(object):
         saveFigure(figure, outputFile)
     
     @disableOnWorkers
-    def save(self):
+    def save_his(self):
         """
         
 
@@ -331,6 +391,8 @@ class LandfallRates(object):
 
         """
         his_outputFile = pjoin(self.dataPath, 'historical_landfall_rates.csv')
+        his_byYear_outputFile = pjoin(self.dataPath, 'historical_landfall_by_Year.csv')
+
         syn_outputFile = pjoin(self.dataPath, 'simulated_landfall_rates.csv')
         
         df_his = pd.DataFrame(columns=['GateID','Landfall_Rates','Landfall_Probability', \
@@ -343,6 +405,27 @@ class LandfallRates(object):
         
         df_his.to_csv(his_outputFile,index=False,float_format="%.3f")
         
+        df_his_byYear = pd.DataFrame(columns=['Year','Total_Landfall_Number'])
+        df_his_byYear['Year']=self.historicYearID
+        df_his_byYear['Total_Landfall_Number']=self.historicLandfallCountbyYear
+        df_his_byYear.to_csv(his_byYear_outputFile,index=False,float_format="%.0f")
+        
+    
+    @disableOnWorkers
+    def save_syn(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
+
+
+        syn_outputFile = pjoin(self.dataPath, 'simulated_landfall_rates.csv')
+        
+
         
         df_syn = pd.DataFrame(columns=['GateID','Landfall_Rates','LFR_95','LFR_5', \
                                        'Landfall_Probability','LFP_95','LFP_5', \
@@ -364,15 +447,17 @@ class LandfallRates(object):
         df_syn['OFP_5'] = self.synLowerOF
         
         df_syn.to_csv(syn_outputFile,index=False,float_format="%.3f")
-
+        
+        
     def run(self):
         """Execute the analysis"""
         global MPI, comm
         MPI = attemptParallel()
         comm = MPI.COMM_WORLD
         self.historic()
-        comm.barrier()
-        self.synthetic()
-        comm.barrier()
-        self.plot()
-        self.save()
+        #comm.barrier()
+        #self.synthetic()
+        #comm.barrier()
+        #self.plot()
+        self.save_his()
+        #self.save_syn()

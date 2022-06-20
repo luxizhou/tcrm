@@ -19,15 +19,15 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from statsmodels.nonparametric.kernel_density import KDEMultivariate
 #from StatInterface import KDEOrigin
 
-case_name = 'china_since1979'
+case_name = 'china_since1979_fine_grid'
 
 simu_folder = os.path.join('/home/lzhou/tcrm/output',case_name,'process','simulated_origins')
 hist_folder = os.path.join('/home/lzhou/tcrm/output',case_name,'process')
 plot_folder = os.path.join('/home/lzhou/tcrm/analysis_scripts/figures',case_name)
 #%% extract genesis points and save to file
 '''
-folder = r'/home/lzhou/tcrm/output/china_since1979/tracks'
-output_dir = r'/home/lzhou/tcrm/output/china_since1979/process/simulated_origins'
+folder = os.path.join('/home/lzhou/tcrm/output',case_name,'tracks')
+output_dir = os.path.join(hist_folder,'simulated_origins')
 
 if os.path.isdir(output_dir) == False:
     os.mkdir(output_dir)
@@ -87,7 +87,7 @@ im = ax[0].imshow(np.rot90(Z), cmap=plt.cm.gist_earth_r, extent=[xmin, xmax, ymi
 #ax[0].text(150,24," {:.2f}, {:.2f}".format(bw[0],bw[1]))
 #ax.text(200,24, 'covariance factor / '+str(scaler))
 fig.colorbar(im,cax=cax, orientation='vertical')
-#fig.set_size_inches(8,6)
+
 
 
 #%% simulated data
@@ -111,17 +111,7 @@ for fn in files[1:]:
 #%%
 simu_fq['Count'] = simu_fq.Count.astype('int')
 bb = simu_fq.Count.values
-#%% plot frequency
-fig1,axes = plt.subplots(2,1,sharex=True)
-sns.histplot(aa,binwidth=1,kde=True,ax=axes[0]).set(title='Historcal Data 1979-2021')
-sns.histplot(bb,binwidth=1,kde=True,ax=axes[1]).set(title='100 Years simulation')
-figname = 'Compare_Genesis_Frequency.png'
-plt.savefig(figname)
-#sns.histplot(aa,binwidth=1,kde=True,ax=axes[0],legend=True)
-#sns.histplot(bb,binwidth=1,kde=True,ax=axes[1],legend=True)
-#figname = 'Compare_Genesis_Frequency.png'
-#ofile = os.path.join(plot_folder,figname)
-#plt.savefig(ofile)
+
 #%% initiate kernel
 simu_kde2 = KDEMultivariate(sarray,bw=bw,var_type='cc')
 #%% evaluate pdf
@@ -133,8 +123,14 @@ cax = divider.append_axes('right', size='5%', pad=0.05)
 im2 = ax[1].imshow(np.rot90(Z), cmap=plt.cm.gist_earth_r, extent=[xmin, xmax, ymin, ymax])
 fig.colorbar(im,cax=cax, orientation='vertical')
 #fig.set_size_inches(8,6)
-
 figname = 'Compare_Genesis_Location.png'
 ofile = os.path.join(plot_folder,figname)
 plt.savefig(ofile)
 
+#%% plot frequency
+fig1,axes = plt.subplots(2,1,sharex=True)
+sns.histplot(aa,binwidth=1,kde=True,ax=axes[0]).set(title='Historcal Data 1979-2021')
+sns.histplot(bb,binwidth=1,kde=True,ax=axes[1]).set(title='100 Years simulation')
+figname = 'Compare_Genesis_Frequency.png'
+ofile = os.path.join(plot_folder,figname)
+plt.savefig(figname)

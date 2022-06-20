@@ -254,6 +254,11 @@ def doDataProcessing(configFile):
     dataProcess = DataProcess(configFile, progressbar=pbar)
     dataProcess.processData()
 
+    from Evaluate import LandfallRates
+    lf = LandfallRates(configFile)
+    lf.historic()
+    lf.save_his()
+
     log.info('Completed Data Processing')
     pbar.update(1.0)
 
