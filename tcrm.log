@@ -1,7 +1,0 @@
-2022-05-09 12:06:56: Started log file /home/lzhou/tcrm/tcrm.log (detail level INFO)
-2022-05-09 12:06:56: Running tcevent.py (pid 23666)
-2022-05-09 12:06:56: Output will be stored under ./output/yasi
-2022-05-09 12:06:56: Interpolating tracks from ./example/yasi_modified.csv
-2022-05-09 12:06:56: Loading ./example/yasi_modified.csv
-2022-05-09 12:06:56: Using index contained in file to determine initial TC positions
-2022-05-09 12:06:56: Loading wind field calculation settings
